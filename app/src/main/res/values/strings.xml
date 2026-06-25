@@ -1,0 +1,52 @@
+<resources>
+
+    <string name="app_name">SmartTask</string>
+
+    <string name="welcome">Welcome Back</string>
+
+    <string name="login">Login</string>
+
+    <string name="signup">Sign Up</string>
+
+    <string name="email">Email</string>
+
+    <string name="password">Password</string>
+
+    <string name="forgot_password">Forgot Password?</string>
+
+    <string name="continue_text">Continue</string>
+
+    <string name="get_started">Get Started</string>
+
+    <string name="create_account">Create Account</string>
+
+    <string name="full_name">Full Name</string>
+
+    <string name="confirm_password">Confirm Password</string>
+
+    <string name="already_have_account">Already have an account?</string>
+
+    <string name="dont_have_account">Do not have an account?</string>
+
+    <string name="smart_tasks">Smart Tasks</string>
+    <string name="remember_me">Remember Me</string>
+    <string name="logout">Logout</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="ai_suggestion">AI Suggestion</string>
+    <string name="add_task">Add Task</string>
+    <string name="task_title">Task Title</string>
+    <string name="task_description">Task Description</string>
+    <string name="priority">Priority</string>
+    <string name="high">High</string>
+    <string name="medium">Medium</string>
+    <string name="low">Low</string>
+    <string name="or">OR</string>
+    <string name="login_subtitle">Login to continue managing your tasks.</string>
+    <string name="create_new_account">Create New Account</string>
+    <string name="create_your_account">Create Your Account</string>
+
+    <string name="signup_subtitle">Create your account to organize tasks efficiently.</string>
+
+    <string name="already_have_account_login">Already have an account? Login</string>
+</resources>
