@@ -7,8 +7,11 @@ import android.os.Looper;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.iqra.smarttask.R;
 import com.iqra.smarttask.activities.auth.LoginActivity;
+import com.iqra.smarttask.activities.dashboard.DashboardActivity;
 import com.iqra.smarttask.utils.Constants;
 
 public class SplashActivity extends AppCompatActivity {
@@ -20,10 +23,30 @@ public class SplashActivity extends AppCompatActivity {
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
 
-            Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+            Intent intent;
+
+            if (user != null) {
+
+                intent = new Intent(
+                        SplashActivity.this,
+                        DashboardActivity.class
+                );
+
+            } else {
+
+                intent = new Intent(
+                        SplashActivity.this,
+                        LoginActivity.class
+                );
+
+            }
+
             startActivity(intent);
             finish();
 
         }, Constants.SPLASH_DELAY);
+
     }
 }

@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.iqra.smarttask.R;
 import com.iqra.smarttask.utils.Validator;
+import com.google.firebase.auth.FirebaseAuth;
+import com.iqra.smarttask.activities.dashboard.DashboardActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -26,6 +28,7 @@ public class LoginActivity extends AppCompatActivity {
 
     // Checkbox
     private CheckBox cbRememberMe;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         initViews();
+        firebaseAuth = FirebaseAuth.getInstance();
         clickListeners();
     }
 
@@ -73,11 +77,7 @@ public class LoginActivity extends AppCompatActivity {
 
             if (validateInputs()) {
 
-                Toast.makeText(
-                        LoginActivity.this,
-                        "Validation Successful",
-                        Toast.LENGTH_SHORT
-                ).show();
+                loginUser();
 
             }
 
@@ -107,6 +107,45 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    private void loginUser() {
+
+        String email = etEmail.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
+
+        firebaseAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+
+                    if (task.isSuccessful()) {
+
+                        Toast.makeText(
+                                LoginActivity.this,
+                                "Login Successful",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                        startActivity(
+                                new Intent(
+                                        LoginActivity.this,
+                                        DashboardActivity.class
+                                )
+                        );
+
+                        finish();
+
+                    } else {
+
+                        Toast.makeText(
+                                LoginActivity.this,
+                                task.getException().getMessage(),
+                                Toast.LENGTH_LONG
+                        ).show();
+
+                    }
+
+                });
+
     }
 
 }
