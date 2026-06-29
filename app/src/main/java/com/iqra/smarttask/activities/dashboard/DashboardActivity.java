@@ -13,11 +13,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.iqra.smarttask.R;
 import com.iqra.smarttask.activities.auth.LoginActivity;
+import com.iqra.smarttask.activities.task.AddTaskActivity;
 
 public class DashboardActivity extends AppCompatActivity {
 
     private TextView txtUserName;
     private TextView txtUserEmail;
+
+    private MaterialButton btnAddTask;
     private MaterialButton btnLogout;
 
     private FirebaseAuth firebaseAuth;
@@ -33,27 +36,41 @@ public class DashboardActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
 
-        loadUserData();
+        loadUserProfile();
 
-        btnLogout.setOnClickListener(v -> showLogoutDialog());
+        clickListeners();
     }
 
     private void initViews() {
 
         txtUserName = findViewById(R.id.txtUserName);
         txtUserEmail = findViewById(R.id.txtUserEmail);
+
+        btnAddTask = findViewById(R.id.btnAddTask);
         btnLogout = findViewById(R.id.btnLogout);
+    }
+
+    private void clickListeners() {
+
+        btnAddTask.setOnClickListener(v -> {
+
+            startActivity(new Intent(
+                    DashboardActivity.this,
+                    AddTaskActivity.class
+            ));
+
+        });
+
+        btnLogout.setOnClickListener(v -> showLogoutDialog());
 
     }
 
-    private void loadUserData() {
+    private void loadUserProfile() {
 
         FirebaseUser user = firebaseAuth.getCurrentUser();
 
         if (user == null)
             return;
-
-        txtUserEmail.setText(user.getEmail());
 
         firestore.collection("users")
                 .document(user.getUid())
@@ -62,11 +79,8 @@ public class DashboardActivity extends AppCompatActivity {
 
                     if (documentSnapshot.exists()) {
 
-                        String fullName = documentSnapshot.getString("fullName");
-
-                        if (fullName != null) {
-                            txtUserName.setText(fullName);
-                        }
+                        txtUserName.setText(documentSnapshot.getString("fullName"));
+                        txtUserEmail.setText(documentSnapshot.getString("email"));
 
                     }
 
@@ -79,7 +93,7 @@ public class DashboardActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle("Logout")
                 .setMessage("Are you sure you want to logout?")
-                .setPositiveButton("Logout", (dialog, which) -> {
+                .setPositiveButton("Yes", (dialog, which) -> {
 
                     firebaseAuth.signOut();
 
@@ -88,12 +102,12 @@ public class DashboardActivity extends AppCompatActivity {
                             LoginActivity.class
                     );
 
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                     startActivity(intent);
 
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton("No", null)
                 .show();
 
     }

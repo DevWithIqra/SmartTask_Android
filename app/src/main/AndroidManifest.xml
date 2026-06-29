@@ -11,6 +11,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SmartTask">
         <activity
+            android:name=".activities.task.AddTaskActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.onboarding.OnboardingActivity"
             android:exported="false" />
         <activity
