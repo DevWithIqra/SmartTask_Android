@@ -89,6 +89,11 @@ public class DashboardActivity extends AppCompatActivity {
                             })
                             .setNegativeButton("Cancel", null)
                             .show();
+                },
+
+                task -> {
+
+                    toggleTaskStatus(task);
 
                 }
 
@@ -204,6 +209,30 @@ public class DashboardActivity extends AppCompatActivity {
                             "Task deleted successfully",
                             android.widget.Toast.LENGTH_SHORT
                     ).show();
+
+                })
+                .addOnFailureListener(e -> {
+
+                    android.widget.Toast.makeText(
+                            DashboardActivity.this,
+                            e.getMessage(),
+                            android.widget.Toast.LENGTH_SHORT
+                    ).show();
+
+                });
+
+    }
+
+    private void toggleTaskStatus(Task task) {
+
+        boolean newStatus = !task.isCompleted();
+
+        firestore.collection("tasks")
+                .document(task.getTaskId())
+                .update("completed", newStatus)
+                .addOnSuccessListener(unused -> {
+
+                    loadTasks();
 
                 })
                 .addOnFailureListener(e -> {

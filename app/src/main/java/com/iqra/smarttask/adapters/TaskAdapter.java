@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.iqra.smarttask.R;
 import com.iqra.smarttask.models.Task;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
 
@@ -23,19 +24,27 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         void onTaskLongClick(Task task);
     }
 
+    public interface OnStatusClickListener {
+        void onStatusClick(Task task);
+    }
+
     private final OnTaskClickListener clickListener;
 
     private final OnTaskLongClickListener listener;
+
+    private final OnStatusClickListener statusClickListener;
 
     private final List<Task> taskList;
 
     public TaskAdapter(List<Task> taskList,
                        OnTaskClickListener clickListener,
-                       OnTaskLongClickListener listener) {
+                       OnTaskLongClickListener listener,
+                       OnStatusClickListener statusClickListener) {
 
         this.taskList = taskList;
         this.clickListener = clickListener;
         this.listener = listener;
+        this.statusClickListener = statusClickListener;
     }
 
     @NonNull
@@ -59,6 +68,43 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 task.isCompleted() ? "Completed" : "Pending"
         );
 
+        holder.btnToggleStatus.setText(
+                task.isCompleted() ? "Mark Pending" : "Mark Complete"
+        );
+        if (task.isCompleted()) {
+
+            holder.txtTaskTitle.setPaintFlags(
+                    holder.txtTaskTitle.getPaintFlags()
+                            | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
+            );
+
+            holder.txtTaskDescription.setPaintFlags(
+                    holder.txtTaskDescription.getPaintFlags()
+                            | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
+            );
+
+            holder.txtTaskStatus.setTextColor(
+                    android.graphics.Color.parseColor("#2E7D32")
+            );
+
+        } else {
+
+            holder.txtTaskTitle.setPaintFlags(
+                    holder.txtTaskTitle.getPaintFlags()
+                            & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG)
+            );
+
+            holder.txtTaskDescription.setPaintFlags(
+                    holder.txtTaskDescription.getPaintFlags()
+                            & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG)
+            );
+
+            holder.txtTaskStatus.setTextColor(
+                    android.graphics.Color.parseColor("#F57C00")
+            );
+
+        }
+
         holder.itemView.setOnClickListener(v -> {
 
             clickListener.onTaskClick(task);
@@ -70,6 +116,12 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             listener.onTaskLongClick(task);
 
             return true;
+        });
+
+        holder.btnToggleStatus.setOnClickListener(v -> {
+
+            statusClickListener.onStatusClick(task);
+
         });
 
     }
@@ -85,12 +137,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         TextView txtTaskDescription;
         TextView txtTaskStatus;
 
+        MaterialButton btnToggleStatus;
+
         public TaskViewHolder(@NonNull View itemView) {
             super(itemView);
 
             txtTaskTitle = itemView.findViewById(R.id.txtTaskTitle);
             txtTaskDescription = itemView.findViewById(R.id.txtTaskDescription);
             txtTaskStatus = itemView.findViewById(R.id.txtTaskStatus);
+
+            btnToggleStatus = itemView.findViewById(R.id.btnToggleStatus);
         }
     }
 }
