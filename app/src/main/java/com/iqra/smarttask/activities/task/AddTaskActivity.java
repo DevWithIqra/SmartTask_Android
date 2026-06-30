@@ -23,6 +23,9 @@ public class AddTaskActivity extends AppCompatActivity {
     private FirebaseFirestore firestore;
     private FirebaseAuth firebaseAuth;
 
+    private String taskId = "";
+    private boolean isEditMode = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +37,8 @@ public class AddTaskActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
 
         clickListeners();
+
+        checkEditMode();
     }
 
     private void initViews() {
@@ -47,7 +52,32 @@ public class AddTaskActivity extends AppCompatActivity {
 
     private void clickListeners() {
 
-        btnSaveTask.setOnClickListener(v -> saveTask());
+        btnSaveTask.setOnClickListener(v -> {
+
+            if (isEditMode) {
+                updateTask();
+            } else {
+                saveTask();
+            }
+
+        });
+
+    }
+
+    private void checkEditMode() {
+
+        taskId = getIntent().getStringExtra("taskId");
+
+        if (taskId != null && !taskId.isEmpty()) {
+
+            isEditMode = true;
+
+            etTitle.setText(getIntent().getStringExtra("title"));
+            etDescription.setText(getIntent().getStringExtra("description"));
+
+            btnSaveTask.setText("Update Task");
+
+        }
 
     }
 
@@ -94,5 +124,49 @@ public class AddTaskActivity extends AppCompatActivity {
                         ).show()
 
                 );
+    }
+
+    private void updateTask() {
+
+        String title = etTitle.getText().toString().trim();
+        String description = etDescription.getText().toString().trim();
+
+        if (title.isEmpty()) {
+
+            etTitle.setError("Enter task title");
+            etTitle.requestFocus();
+            return;
+
+        }
+
+        HashMap<String, Object> task = new HashMap<>();
+
+        task.put("title", title);
+        task.put("description", description);
+
+        firestore.collection("tasks")
+                .document(taskId)
+                .update(task)
+                .addOnSuccessListener(unused -> {
+
+                    Toast.makeText(
+                            AddTaskActivity.this,
+                            "Task Updated Successfully",
+                            Toast.LENGTH_SHORT
+                    ).show();
+
+                    finish();
+
+                })
+                .addOnFailureListener(e ->
+
+                        Toast.makeText(
+                                AddTaskActivity.this,
+                                e.getMessage(),
+                                Toast.LENGTH_SHORT
+                        ).show()
+
+                );
+
     }
 }

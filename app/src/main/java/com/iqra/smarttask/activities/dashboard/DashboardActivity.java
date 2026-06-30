@@ -15,6 +15,16 @@ import com.iqra.smarttask.R;
 import com.iqra.smarttask.activities.auth.LoginActivity;
 import com.iqra.smarttask.activities.task.AddTaskActivity;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.iqra.smarttask.adapters.TaskAdapter;
+import com.iqra.smarttask.models.Task;
+
+import java.util.ArrayList;
+import java.util.List;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 public class DashboardActivity extends AppCompatActivity {
 
     private TextView txtUserName;
@@ -22,6 +32,12 @@ public class DashboardActivity extends AppCompatActivity {
 
     private MaterialButton btnAddTask;
     private MaterialButton btnLogout;
+
+    private RecyclerView recyclerTasks;
+    private TextView txtNoTasks;
+
+    private List<Task> taskList;
+    private TaskAdapter taskAdapter;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firestore;
@@ -38,6 +54,53 @@ public class DashboardActivity extends AppCompatActivity {
 
         loadUserProfile();
 
+        taskList = new ArrayList<>();
+
+        taskAdapter = new TaskAdapter(
+
+                taskList,
+
+                task -> {
+
+                    Intent intent = new Intent(
+                            DashboardActivity.this,
+                            AddTaskActivity.class
+                    );
+
+                    intent.putExtra("taskId", task.getTaskId());
+                    intent.putExtra("title", task.getTitle());
+                    intent.putExtra("description", task.getDescription());
+                    intent.putExtra("dueDate", task.getDueDate());
+                    intent.putExtra("priority", task.getPriority());
+
+                    startActivity(intent);
+
+                },
+
+                task -> {
+
+                    new AlertDialog.Builder(DashboardActivity.this)
+                            .setTitle("Delete Task")
+                            .setMessage("Are you sure you want to delete this task?")
+                            .setPositiveButton("Delete", (dialog, which) -> {
+
+                                deleteTask(task);
+
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .show();
+
+                }
+
+        );
+
+        recyclerTasks.setLayoutManager(
+                new LinearLayoutManager(this)
+        );
+
+        recyclerTasks.setAdapter(taskAdapter);
+        loadTasks();
+
         clickListeners();
     }
 
@@ -48,6 +111,9 @@ public class DashboardActivity extends AppCompatActivity {
 
         btnAddTask = findViewById(R.id.btnAddTask);
         btnLogout = findViewById(R.id.btnLogout);
+
+        recyclerTasks = findViewById(R.id.recyclerTasks);
+        txtNoTasks = findViewById(R.id.txtNoTasks);
     }
 
     private void clickListeners() {
@@ -86,6 +152,77 @@ public class DashboardActivity extends AppCompatActivity {
 
                 });
 
+    }
+
+    private void loadTasks() {
+
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+
+        if (user == null)
+            return;
+
+        firestore.collection("tasks")
+                .whereEqualTo("userId", user.getUid())
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+
+                    taskList.clear();
+
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+
+                        Task task = document.toObject(Task.class);
+
+                        task.setTaskId(document.getId());
+
+                        taskList.add(task);
+
+                    }
+
+                    taskAdapter.notifyDataSetChanged();
+
+                    if (taskList.isEmpty()) {
+                        txtNoTasks.setVisibility(TextView.VISIBLE);
+                    } else {
+                        txtNoTasks.setVisibility(TextView.GONE);
+                    }
+
+                });
+
+    }
+
+    private void deleteTask(Task task) {
+
+        firestore.collection("tasks")
+                .document(task.getTaskId())
+                .delete()
+                .addOnSuccessListener(unused -> {
+
+                    loadTasks();
+
+                    android.widget.Toast.makeText(
+                            DashboardActivity.this,
+                            "Task deleted successfully",
+                            android.widget.Toast.LENGTH_SHORT
+                    ).show();
+
+                })
+                .addOnFailureListener(e -> {
+
+                    android.widget.Toast.makeText(
+                            DashboardActivity.this,
+                            e.getMessage(),
+                            android.widget.Toast.LENGTH_SHORT
+                    ).show();
+
+                });
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        loadTasks();
     }
 
     private void showLogoutDialog() {
