@@ -13,6 +13,9 @@ import com.iqra.smarttask.models.Task;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
 
@@ -64,6 +67,29 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
         holder.txtTaskTitle.setText(task.getTitle());
         holder.txtTaskDescription.setText(task.getDescription());
+        holder.txtTaskDueDate.setText("Due Date: " + task.getDueDate());
+        holder.txtTaskPriority.setText("Priority: " + task.getPriority());
+        String priority = task.getPriority();
+
+        if ("High".equalsIgnoreCase(priority)) {
+
+            holder.txtTaskPriority.setTextColor(
+                    holder.itemView.getContext().getColor(android.R.color.holo_red_dark)
+            );
+
+        } else if ("Medium".equalsIgnoreCase(priority)) {
+
+            holder.txtTaskPriority.setTextColor(
+                    holder.itemView.getContext().getColor(android.R.color.holo_orange_dark)
+            );
+
+        } else {
+
+            holder.txtTaskPriority.setTextColor(
+                    holder.itemView.getContext().getColor(android.R.color.holo_green_dark)
+            );
+
+        }
         holder.txtTaskStatus.setText(
                 task.isCompleted() ? "Completed" : "Pending"
         );
@@ -105,6 +131,39 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
         }
 
+        try {
+
+            if (!task.isCompleted()
+                    && task.getDueDate() != null
+                    && !task.getDueDate().isEmpty()) {
+
+                SimpleDateFormat sdf =
+                        new SimpleDateFormat("d/M/yyyy", Locale.getDefault());
+
+                Date dueDate = sdf.parse(task.getDueDate());
+
+                if (dueDate != null && dueDate.before(new Date())) {
+
+                    holder.txtOverdue.setVisibility(View.VISIBLE);
+
+                } else {
+
+                    holder.txtOverdue.setVisibility(View.GONE);
+
+                }
+
+            } else {
+
+                holder.txtOverdue.setVisibility(View.GONE);
+
+            }
+
+        } catch (Exception e) {
+
+            holder.txtOverdue.setVisibility(View.GONE);
+
+        }
+
         holder.itemView.setOnClickListener(v -> {
 
             clickListener.onTaskClick(task);
@@ -136,6 +195,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         TextView txtTaskTitle;
         TextView txtTaskDescription;
         TextView txtTaskStatus;
+        TextView txtTaskDueDate;
+        TextView txtTaskPriority;
+        TextView txtOverdue;
 
         MaterialButton btnToggleStatus;
 
@@ -145,6 +207,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             txtTaskTitle = itemView.findViewById(R.id.txtTaskTitle);
             txtTaskDescription = itemView.findViewById(R.id.txtTaskDescription);
             txtTaskStatus = itemView.findViewById(R.id.txtTaskStatus);
+
+            txtTaskDueDate = itemView.findViewById(R.id.txtTaskDueDate);
+            txtTaskPriority = itemView.findViewById(R.id.txtTaskPriority);
+            txtOverdue = itemView.findViewById(R.id.txtOverdue);
 
             btnToggleStatus = itemView.findViewById(R.id.btnToggleStatus);
         }

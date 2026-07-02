@@ -34,6 +34,24 @@
             android:textColor="@color/textSecondary"/>
 
         <TextView
+            android:id="@+id/txtTaskDueDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Due Date"
+            android:textColor="@color/textSecondary"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:id="@+id/txtTaskPriority"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Priority"
+            android:textStyle="bold"
+            android:textSize="14sp"/>
+
+        <TextView
             android:id="@+id/txtTaskStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -41,6 +59,16 @@
             android:text="Pending"
             android:textStyle="bold"
             android:textColor="@color/primary"/>
+
+        <TextView
+            android:id="@+id/txtOverdue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="⚠ OVERDUE"
+            android:textColor="@android:color/holo_red_dark"
+            android:textStyle="bold"
+            android:visibility="gone"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnToggleStatus"
